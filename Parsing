@@ -1,0 +1,6 @@
+import requests
+from bs4 import BeautifulSoup
+url = "https://www.channelfutures.com/galleries/2023-msp-501-rankings-50-1-gallery"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, "html.parser")
+print(soup)
