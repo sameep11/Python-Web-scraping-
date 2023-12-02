@@ -1,0 +1,72 @@
+import pandas as pd
+import openpyxl
+import shutil
+import sys
+from openpyxl import load_workbook
+workbook = load_workbook(r"C:\Users\sagupta\Documents\URL Scrap\ZOOMINFO Automation.xlsx")
+sheet = workbook['ZOOMINFO Automation']
+count = sheet.max_column
+
+if (count == 71):
+    columns_to_delete = [1,4,5,6,8,9,10,13,14,16,17,18,19,20,21,22,23,24,25,26,29,30,31,32,33,34,36,37,38,39,40,41,42,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,69,70,71]
+    for col_idx in sorted(columns_to_delete, reverse=True):
+        sheet.delete_cols(col_idx)
+
+else:
+    print("wrong count")
+    sys.exit()
+
+workbook.save('ZI.xlsx')
+workbook.close()
+
+file = 'ZI.xlsx'
+destination_folder = r"C:\Users\sagupta\Documents\URL Scrap\Zoominfofinal.xlsx"
+csv_file_path= r"C:\Users\sagupta\Documents\URL Scrap\Zoominfofinal.csv"
+shutil.move(file, destination_folder)
+df = pd.read_excel(destination_folder)
+df.to_csv(csv_file_path, index=False)
+
+def categorize_title(title):
+
+        if any(keyword in title.lower() for keyword in ['chief', 'cio', 'cmo','ciso','owner','founder','cofounder','coo','cfo','ceo','executive']):
+            return 'Executive'
+        elif 'vice president' in title.lower():
+            return 'Vice President'
+        elif 'vp' in title.lower():
+            return 'Vice President'
+        elif 'president' in title.lower():
+            return 'Vice President'
+        elif 'director' in title.lower():
+            return 'Director'
+        elif 'manager' in title.lower():
+            return 'Manager'
+        elif pd.isna(title):
+            return ''
+        else:
+            return 'Other'
+df['Job Level'] = df['Job Title'].apply(categorize_title)
+df['Lead Status'] = ["New Prospect"] * len(df)
+df['Lead Type'] = ["New Customer"] * len(df)
+df['Campaign ID'] = ["7014x00000126CgAAI"] * len(df)
+df['Lead Source'] = ["Marketing-List"] * len(df)
+df['Lead Source Details'] = ["Buyer Intent Surge MDR Sep 2023"] * len(df)
+new_column_names = {
+    'Job Title': 'Title',
+    'Direct Phone Number': 'Phone',
+    'Job Title': 'Title',
+    'Direct Phone Number': 'Phone',
+    'Email Address': 'Email',
+    'Mobile phone': 'Mobile',
+    'Company Name': 'Company',
+    'Employees': 'No of Employee',
+    'Primary Industry': 'Business Type',
+    'Primary Sub-Industry':'Business Type Other',
+    'Company Street Address':'Street',
+    'Company City':'City',
+    'Company State':'State/Province',
+    'Company Zip Code':'Zip/Postal Code',
+    'Company Country':'Country'
+}
+
+df.rename(columns=new_column_names, inplace=True)
+df.to_csv(csv_file_path, index=False)
